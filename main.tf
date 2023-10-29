@@ -1,6 +1,8 @@
 variable "aws_account" {}
 variable "region" {}
 variable "secrets_path" {}
+variable "linkedin_token" {}
+variable "linkedin_user" {}
 
 provider "aws" {
   region                   = var.region
@@ -14,12 +16,19 @@ data "archive_file" "zip_of_lambda_code" {
 }
 
 resource "aws_lambda_function" "lambda" {
-  function_name = "linkedin_bot"
-  role          = aws_iam_role.lambda_role.arn
-  filename      = "${path.module}/out/lambda.zip"
-  handler       = "main.main"
-  runtime       = "python3.11"
-  depends_on    = [aws_iam_role_policy_attachment.attach_policy_to_role]
+  function_name    = "linkedin_bot"
+  role             = aws_iam_role.lambda_role.arn
+  filename         = "${path.module}/out/lambda.zip"
+  handler          = "main.main"
+  runtime          = "python3.11"
+  depends_on       = [aws_iam_role_policy_attachment.attach_policy_to_role]
+  source_code_hash = data.archive_file.zip_of_lambda_code.output_base64sha256
+  environment {
+    variables = {
+      LINKEDIN_TOKEN = var.linkedin_token
+      LINKEDIN_USER  = var.linkedin_user
+    }
+  }
 }
 
 resource "aws_iam_policy" "lambda_policy" {
