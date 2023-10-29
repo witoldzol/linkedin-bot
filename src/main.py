@@ -2,7 +2,7 @@ import sys
 
 # we use lib to separate requried packages from unnecessary crap like pip, setuptools etc
 # because we have it separated, we can package it and upload with code
-# we use sys.path.insert at add this folder to pythonpath so that it can find dependencies
+# we use sys.path.insert to add this folder to pythonpath so that python can find dependencies
 sys.path.insert(0, "lib")
 import requests
 
