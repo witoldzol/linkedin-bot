@@ -9,6 +9,10 @@ Software is eating the world.
 we keep duplicating dynamodb resource code
 move it to main and pass as param
 
+# remove sys.exit()  from code
+just raise and let Lambda handle it, if call is sync it will not retry
+
+
 ## DONE
 
 # create dynamodb
