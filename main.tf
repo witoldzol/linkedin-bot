@@ -75,3 +75,21 @@ resource "aws_iam_role_policy_attachment" "attach_policy_to_role" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
+
+resource "aws_dynamodb_table" "quotes-table" {
+  name         = "quotes"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "msg"
+  range_key    = "used"
+
+  attribute {
+    name = "msg"
+    type = "S"
+  }
+
+  attribute {
+    name = "used"
+    type = "N"
+  }
+}
+
