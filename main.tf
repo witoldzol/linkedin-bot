@@ -19,7 +19,7 @@ resource "aws_lambda_function" "lambda" {
   function_name    = "linkedin_bot"
   role             = aws_iam_role.lambda_role.arn
   filename         = "${path.module}/out/lambda.zip"
-  handler          = "main.main"
+  handler          = "handler.main"
   runtime          = "python3.11"
   depends_on       = [aws_iam_role_policy_attachment.attach_policy_to_role]
   source_code_hash = data.archive_file.zip_of_lambda_code.output_base64sha256
@@ -47,6 +47,16 @@ resource "aws_iam_policy" "lambda_policy" {
                 "arn:aws:logs:${var.region}:${var.aws_account}:log-group:/aws/lambda/linkedin_bot:*"
             ],
             "Effect": "Allow"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:GetItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:Query",
+            "dynamodb:Scan"
+          ],
+          "Resource": "${aws_dynamodb_table.quotes-table.arn}"
         }
     ]
 }
@@ -80,16 +90,10 @@ resource "aws_dynamodb_table" "quotes-table" {
   name         = "quotes"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "msg"
-  range_key    = "used"
 
   attribute {
     name = "msg"
     type = "S"
-  }
-
-  attribute {
-    name = "used"
-    type = "N"
   }
 }
 
