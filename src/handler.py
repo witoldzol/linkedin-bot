@@ -58,10 +58,10 @@ def mark_quote_as_used_in_db(key_value: str):
         ExpressionAttributeNames=expression_attribute_names,
         ExpressionAttributeValues=expression_attribute_values,
     )
-    print("Update sucessful")
+    print("Successfully marked item in dynamodb as `used`")
 
 
-def post_on_timeline(msg: str, token: str, user_id: str) -> None:
+def post_on_linkedin_timeline(msg: str, token: str, user_id: str) -> None:
     print("Posting on linkedin timeline")
     url = "https://api.linkedin.com/v2/ugcPosts"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
@@ -83,30 +83,38 @@ def post_on_timeline(msg: str, token: str, user_id: str) -> None:
         print("Error posting to timeline: ", response.json())
 
 
-def send_to_sns(message):
+def send_telegram_message(message):
     message = f"This message was posted on your timeline:\n\n{message}"
-    topic_arn = os.environ.get("SNS_TOPIC_ARN")
-    region = os.environ.get("AWS_REGION")
-    sns = boto3.client("sns", region_name=region)
-    response = sns.publish(TopicArn=topic_arn, Message=message)
-    print("Message sent to SNS with MessageId:", response["MessageId"])
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if not chat_id:
+        raise Exception('TELEGRAM_CHAT_ID variable not set, exiting')
+    telegram_token = os.environ.get("TELEGRAM_TOKEN")
+    if not telegram_token:
+        raise Exception('TELEGRAM_TOKEN variable not set, exiting')
+    url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
+    payload = {"chat_id": chat_id, "text": message}
+    response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        print("Message sent successfully to telegram channel")
+    else:
+        print("Failed to send message to telegram channel")
+        print(response.json())
 
 
 def main(event, context=None):
-    user_id = os.environ.get("LINKEDIN_USER")
-    token = os.environ.get("LINKEDIN_TOKEN")
-    if not token:
-        print("Linkedin token not found, exiting")
-        sys.exit(1)
-    if not user_id:
-        print("Linkedin user id not found, exiting")
-        sys.exit(1)
+    linkedin_user_id = os.environ.get("LINKEDIN_USER")
+    linkedin_token = os.environ.get("LINKEDIN_TOKEN")
+    if not linkedin_token:
+        raise Exception("LINKEDIN_TOKEN var not set, exiting")
+    if not linkedin_user_id:
+        raise Exception("LINKEDIN_USER var not set, exiting")
     quotes = get_quotes("quotes", 10)
     random_quote = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
-    print(f"Selected random quote:\n{text}")
-    # post_on_timeline(text, token, user_id) #todo -  revert
-    # mark_quote_as_used_in_db(random_quote["msg"])
+    print(f"Selected random quote:\n{text}\n")
+    post_on_linkedin_timeline(text, linkedin_token, linkedin_user_id)
+    mark_quote_as_used_in_db(random_quote["msg"])
+    send_telegram_message(text)
 
 
 if __name__ == "__main__":
