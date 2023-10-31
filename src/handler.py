@@ -42,6 +42,7 @@ def get_user_id(token: str) -> str:
 
 
 def mark_quote_as_used_in_db(key_value: str):
+    print("Marking quote as `used`")
     region = os.environ.get("AWS_REGION")
     dynamodb = boto3.resource("dynamodb", region_name=region)
     table_name = "quotes"
@@ -61,6 +62,7 @@ def mark_quote_as_used_in_db(key_value: str):
 
 
 def post_on_timeline(msg: str, token: str, user_id: str) -> None:
+    print("Posting on linkedin timeline")
     url = "https://api.linkedin.com/v2/ugcPosts"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     body = {
@@ -103,10 +105,8 @@ def main(event, context=None):
     random_quote = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}")
-    print("Posting on linkedin timeline")
     # post_on_timeline(text, token, user_id) #todo -  revert
-    print("Successfuly posted on timeline, marking quote as `used`")
-    mark_quote_as_used_in_db(random_quote["msg"])
+    # mark_quote_as_used_in_db(random_quote["msg"])
 
 
 if __name__ == "__main__":
