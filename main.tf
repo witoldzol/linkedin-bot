@@ -3,6 +3,8 @@ variable "region" {}
 variable "secrets_path" {}
 variable "linkedin_token" {}
 variable "linkedin_user" {}
+variable "telegram_chat_id" {}
+variable "telegram_token" {}
 
 provider "aws" {
   region                   = var.region
@@ -95,12 +97,4 @@ resource "aws_dynamodb_table" "quotes-table" {
     name = "msg"
     type = "S"
   }
-}
-
-resource "aws_sns_topic" "topic" {
-  name = "linkedin_bot_topic"
-}
-
-output "sns_topic_arn" {
-  value = aws_sns_topic.topic.arn
 }
