@@ -41,7 +41,7 @@ def get_user_id(token: str) -> str:
     return user_id
 
 
-def update_value(key_value: str):
+def mark_quote_as_used_in_db(key_value: str):
     region = os.environ.get("AWS_REGION")
     dynamodb = boto3.resource("dynamodb", region_name=region)
     table_name = "quotes"
@@ -81,6 +81,15 @@ def post_on_timeline(msg: str, token: str, user_id: str) -> None:
         print("Error posting to timeline: ", response.json())
 
 
+def send_to_sns(message):
+    message = f"This message was posted on your timeline:\n\n{message}"
+    topic_arn = os.environ.get("SNS_TOPIC_ARN")
+    region = os.environ.get("AWS_REGION")
+    sns = boto3.client("sns", region_name=region)
+    response = sns.publish(TopicArn=topic_arn, Message=message)
+    print("Message sent to SNS with MessageId:", response["MessageId"])
+
+
 def main(event, context=None):
     user_id = os.environ.get("LINKEDIN_USER")
     token = os.environ.get("LINKEDIN_TOKEN")
@@ -95,9 +104,9 @@ def main(event, context=None):
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}")
     print("Posting on linkedin timeline")
-    # post_on_timeline(text, token, user_id)
+    # post_on_timeline(text, token, user_id) #todo -  revert
     print("Successfuly posted on timeline, marking quote as `used`")
-    update_value(random_quote["msg"])
+    mark_quote_as_used_in_db(random_quote["msg"])
 
 
 if __name__ == "__main__":
