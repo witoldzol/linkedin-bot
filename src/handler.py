@@ -46,20 +46,18 @@ def update_value(key_value: str):
     dynamodb = boto3.resource("dynamodb", region_name=region)
     table_name = "quotes"
     table = dynamodb.Table(table_name)
-    key = {
-        "msg": key_value
-    }
+    key = {"msg": key_value}
     update_expression = "SET #attributeName = :newValue"
     expression_attribute_names = {"#attributeName": "used"}
     expression_attribute_values = {":newValue": 1}
-    print(f'Updating key: {key}')
+    print(f"Updating key: {key}")
     table.update_item(
         Key=key,
         UpdateExpression=update_expression,
         ExpressionAttributeNames=expression_attribute_names,
         ExpressionAttributeValues=expression_attribute_values,
     )
-    print('Update sucessful')
+    print("Update sucessful")
 
 
 def post_on_timeline(msg: str, token: str, user_id: str) -> None:
@@ -96,9 +94,9 @@ def main(event, context=None):
     random_quote = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}")
-    print('Posting on linkedin timeline')
+    print("Posting on linkedin timeline")
     # post_on_timeline(text, token, user_id)
-    print('Successfuly posted on timeline, marking quote as `used`')
+    print("Successfuly posted on timeline, marking quote as `used`")
     update_value(random_quote["msg"])
 
 

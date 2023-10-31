@@ -36,7 +36,7 @@ def main():
                 Item=item, ConditionExpression="attribute_not_exists(msg)"
             )
             print(f"Successfull insertion : {response}")
-            print('----------------------------------')
+            print("----------------------------------")
         except dynamodb.meta.client.exceptions.ConditionalCheckFailedException:
             print(f"Item already exists.\nSkipped item: {item}")
         except Exception as e:
