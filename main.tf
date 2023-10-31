@@ -97,3 +97,10 @@ resource "aws_dynamodb_table" "quotes-table" {
   }
 }
 
+resource "aws_sns_topic" "topic" {
+  name = "linkedin_bot_topic"
+}
+
+output "sns_topic_arn" {
+  value = aws_sns_topic.topic.arn
+}
