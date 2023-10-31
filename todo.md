@@ -1,5 +1,4 @@
-# create sns topic
-when we successfully post to linkedin, send message to sns so that I get an email with the posted message
+# create event trigger in cloudwatch, set retry=0
 
 # one of the messages is already marked as one, revert that once table is consistent
 Software is eating the world.
@@ -12,6 +11,7 @@ move it to main and pass as param
 # remove sys.exit()  from code
 just raise and let Lambda handle it, if call is sync it will not retry
 
+# use logging instead of prints
 
 ## DONE
 
@@ -31,3 +31,9 @@ print how many go uploaded, how many got deduped
 # update publisher lambda
 it can read from dynamo, and update rows
 when it reads and publishes quote to linkedin, it marks that quote as 'used'
+
+# create sns topic
+when we successfully post to linkedin, send message to sns so that I get an email with the posted message
+
+# delete sns topic
+use telegram instead - its faster than email
