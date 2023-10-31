@@ -6,3 +6,4 @@ requirements.txt
 terraform.tfstate*
 out
 vars.tfvars
+vars.sh
