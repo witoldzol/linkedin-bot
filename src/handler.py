@@ -118,7 +118,7 @@ def main(event, context=None):
         raise Exception("LINKEDIN_TOKEN var not set, exiting")
     if not linkedin_user_id:
         raise Exception("LINKEDIN_USER var not set, exiting")
-    quotes = get_quotes("quotes", 10)
+    quotes = get_quotes("quotes", 50)
     random_quote: Dict[str, str] = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}\n")
