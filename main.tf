@@ -5,6 +5,7 @@ variable "linkedin_token" {}
 variable "linkedin_user" {}
 variable "telegram_chat_id" {}
 variable "telegram_token" {}
+variable "sentry_dsn" {}
 
 provider "aws" {
   region                   = var.region
@@ -31,6 +32,7 @@ resource "aws_lambda_function" "lambda" {
       LINKEDIN_USER    = var.linkedin_user
       TELEGRAM_CHAT_ID = var.telegram_chat_id
       TELEGRAM_TOKEN   = var.telegram_token
+      SENTRY_DSN       = var.sentry_dsn
     }
   }
 }
