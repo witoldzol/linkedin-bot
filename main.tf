@@ -101,11 +101,26 @@ resource "aws_dynamodb_table" "quotes-table" {
 
 resource "aws_cloudwatch_event_rule" "event_rule" {
   name                = "linkedin_bot_event_rule"
-  schedule_expression = "cron(0 8 ? * * *)"
+  schedule_expression = "cron(30 8 ? * * *)"
 }
+
+resource "aws_lambda_permission" "event_rule_permission" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.event_rule.arn
+}
+
 
 resource "aws_cloudwatch_event_target" "event_target" {
   rule      = aws_cloudwatch_event_rule.event_rule.name
   target_id = "linkedin_bot_event_rule_target"
   arn       = aws_lambda_function.lambda.arn
+}
+
+resource "aws_lambda_function_event_invoke_config" "lambda_error_handling_config" {
+  function_name                = aws_lambda_function.lambda.function_name
+  maximum_event_age_in_seconds = 60
+  maximum_retry_attempts       = 0
 }
