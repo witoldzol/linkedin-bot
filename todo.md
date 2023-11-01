@@ -1,8 +1,8 @@
+# use Sentry to monitor alerts ( alternative - use cloudwatch alerts)
+
 # refactor code 
 we keep duplicating dynamodb resource code
 move it to main and pass as param
-
-# use logging instead of prints
 
 ## DONE
 
