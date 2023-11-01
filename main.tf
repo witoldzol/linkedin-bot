@@ -27,8 +27,10 @@ resource "aws_lambda_function" "lambda" {
   source_code_hash = data.archive_file.zip_of_lambda_code.output_base64sha256
   environment {
     variables = {
-      LINKEDIN_TOKEN = var.linkedin_token
-      LINKEDIN_USER  = var.linkedin_user
+      LINKEDIN_TOKEN   = var.linkedin_token
+      LINKEDIN_USER    = var.linkedin_user
+      TELEGRAM_CHAT_ID = var.telegram_chat_id
+      TELEGRAM_TOKEN   = var.telegram_token
     }
   }
 }
