@@ -36,8 +36,7 @@ def get_user_id(token: str) -> str:
     if response.ok:
         user_id = response.json()["sub"]
     else:
-        print("Error getting user id from linkedin: ", response.json())
-        sys.exit(1)
+        raise Exception("Error getting user id from linkedin: ", response.json())
     return user_id
 
 

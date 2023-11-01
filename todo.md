@@ -1,15 +1,6 @@
-# create event trigger in cloudwatch, set retry=0
-
-# one of the messages is already marked as one, revert that once table is consistent
-Software is eating the world.
-- Marc Andreessen
-
 # refactor code 
 we keep duplicating dynamodb resource code
 move it to main and pass as param
-
-# remove sys.exit()  from code
-just raise and let Lambda handle it, if call is sync it will not retry
 
 # use logging instead of prints
 
@@ -37,3 +28,9 @@ when we successfully post to linkedin, send message to sns so that I get an emai
 
 # delete sns topic
 use telegram instead - its faster than email
+
+# create event trigger in cloudwatch, set retry=0
+
+# remove sys.exit()  from code
+just raise and let Lambda handle it, if call is sync it will not retry
+
