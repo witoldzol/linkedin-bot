@@ -1,5 +1,5 @@
 import random
-from typing import List
+from typing import List, Dict
 import boto3
 import sys
 import os
@@ -11,7 +11,7 @@ sys.path.insert(0, "lib")
 import requests
 
 
-def get_quotes(table_name: str, limit: int) -> List[str]:
+def get_quotes(table_name: str, limit: int) -> List[Dict[str, str]]:
     region = os.environ.get("AWS_REGION")
     dynamodb = boto3.resource("dynamodb", region_name=region)
     table = dynamodb.Table(table_name)
@@ -87,10 +87,10 @@ def send_telegram_message(message):
     message = f"This message was posted on your timeline:\n\n{message}"
     chat_id = os.environ.get("TELEGRAM_CHAT_ID")
     if not chat_id:
-        raise Exception('TELEGRAM_CHAT_ID variable not set, exiting')
+        raise Exception("TELEGRAM_CHAT_ID variable not set, exiting")
     telegram_token = os.environ.get("TELEGRAM_TOKEN")
     if not telegram_token:
-        raise Exception('TELEGRAM_TOKEN variable not set, exiting')
+        raise Exception("TELEGRAM_TOKEN variable not set, exiting")
     url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
     payload = {"chat_id": chat_id, "text": message}
     response = requests.post(url, json=payload)
@@ -109,7 +109,7 @@ def main(event, context=None):
     if not linkedin_user_id:
         raise Exception("LINKEDIN_USER var not set, exiting")
     quotes = get_quotes("quotes", 10)
-    random_quote = random.choice(quotes)
+    random_quote: Dict[str, str] = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}\n")
     post_on_linkedin_timeline(text, linkedin_token, linkedin_user_id)
