@@ -3,7 +3,7 @@ venv
 .terraform.lock.hcl
 requirements.txt
 .terraform/*
-terraform.tfstate*
+*terraform.tfstate*
 out
 vars.tfvars
 vars.sh
