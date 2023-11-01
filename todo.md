@@ -1,5 +1,3 @@
-# use Sentry to monitor alerts ( alternative - use cloudwatch alerts)
-
 # refactor code 
 we keep duplicating dynamodb resource code
 move it to main and pass as param
@@ -33,4 +31,6 @@ use telegram instead - its faster than email
 
 # remove sys.exit()  from code
 just raise and let Lambda handle it, if call is sync it will not retry
+
+# use Sentry to monitor alerts ( alternative - use cloudwatch alerts)
 
