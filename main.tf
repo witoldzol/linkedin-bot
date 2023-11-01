@@ -98,3 +98,14 @@ resource "aws_dynamodb_table" "quotes-table" {
     type = "S"
   }
 }
+
+resource "aws_cloudwatch_event_rule" "event_rule" {
+  name                = "linkedin_bot_event_rule"
+  schedule_expression = "cron(0 8 ? * * *)"
+}
+
+resource "aws_cloudwatch_event_target" "event_target" {
+  rule      = aws_cloudwatch_event_rule.event_rule.name
+  target_id = "linkedin_bot_event_rule_target"
+  arn       = aws_lambda_function.lambda.arn
+}
