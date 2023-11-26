@@ -7,3 +7,4 @@ requirements.txt
 out
 vars.tfvars
 vars.sh
+*.sh
