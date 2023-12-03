@@ -105,7 +105,7 @@ resource "aws_dynamodb_table" "quotes-table" {
 
 resource "aws_cloudwatch_event_rule" "event_rule" {
   name                = "linkedin_bot_event_rule"
-  schedule_expression = "cron(30 8 ? * * *)"
+  schedule_expression = "cron(34 8 ? * * *)"
 }
 
 resource "aws_lambda_permission" "event_rule_permission" {
