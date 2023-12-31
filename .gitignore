@@ -8,3 +8,4 @@ out
 vars.tfvars
 vars.sh
 *.sh
+get-token.md
