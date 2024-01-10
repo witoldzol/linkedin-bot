@@ -11,6 +11,9 @@ sys.path.insert(0, "lib")
 import requests
 import sentry_sdk
 
+SOURCE_TABLE_NAME = 'quotes'
+DESTINATION_TABLE_NAME = 'used_quotes'
+
 sentry_sdk.init(
     dsn = os.environ.get("SENTRY_DSN"),
     # Set traces_sample_rate to 1.0 to capture 100%
@@ -50,26 +53,22 @@ def get_user_id(token: str) -> str:
         raise Exception("Error getting user id from linkedin: ", response.json())
     return user_id
 
-
-def mark_quote_as_used_in_db(key_value: str):
-    print("Marking quote as `used`")
-    region = os.environ.get("AWS_REGION")
-    dynamodb = boto3.resource("dynamodb", region_name=region)
-    table_name = "quotes"
-    table = dynamodb.Table(table_name)
-    key = {"msg": key_value}
-    update_expression = "SET #attributeName = :newValue"
-    expression_attribute_names = {"#attributeName": "used"}
-    expression_attribute_values = {":newValue": 1}
-    print(f"Updating key: {key}")
-    table.update_item(
-        Key=key,
-        UpdateExpression=update_expression,
-        ExpressionAttributeNames=expression_attribute_names,
-        ExpressionAttributeValues=expression_attribute_values,
+def copy_and_delete_from_dynamodb_table(source_table_name, destination_table_name, item):
+    dynamodb = boto3.resource('dynamodb')
+    source_table = dynamodb.Table(source_table_name)
+    destination_table = dynamodb.Table(destination_table_name)
+    # Copy from source to destination
+    if 'used' in item:
+        del item['used']
+    destination_table.put_item(Item=item)
+    print(f"Copied {item} from table {source_table_name} to {destination_table_name}")
+    # Delete items from the source table
+    source_table.delete_item(
+        Key={
+            'msg': item['msg']
+        }
     )
-    print("Successfully marked item in dynamodb as `used`")
-
+    print(f"Deleted {item} from table: {source_table_name}")
 
 def post_on_linkedin_timeline(msg: str, token: str, user_id: str) -> None:
     print("Posting on linkedin timeline")
@@ -90,7 +89,7 @@ def post_on_linkedin_timeline(msg: str, token: str, user_id: str) -> None:
     if response.ok:
         print("Successfuly posted message on the timeline")
     else:
-        print("Error posting to timeline: ", response.json())
+        raise Exception(f"Failed to post to Linkedin: {response.json()}")
 
 
 def send_telegram_message(message):
@@ -118,14 +117,14 @@ def main(event, context=None):
         raise Exception("LINKEDIN_TOKEN var not set, exiting")
     if not linkedin_user_id:
         raise Exception("LINKEDIN_USER var not set, exiting")
-    quotes = get_quotes("quotes", 50)
+    quotes = get_quotes("quotes", 5)
     if not quotes:
         raise Exception('No quotes returned from dynamodb query')
     random_quote: Dict[str, str] = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}\n")
     post_on_linkedin_timeline(text, linkedin_token, linkedin_user_id)
-    mark_quote_as_used_in_db(random_quote["msg"])
+    copy_and_delete_from_dynamodb_table(SOURCE_TABLE_NAME, DESTINATION_TABLE_NAME, random_quote)
     send_telegram_message(text)
 
 
