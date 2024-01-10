@@ -103,6 +103,17 @@ resource "aws_dynamodb_table" "quotes-table" {
   }
 }
 
+resource "aws_dynamodb_table" "used_quotes_table" {
+  name         = "used_quotes"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "msg"
+
+  attribute {
+    name = "msg"
+    type = "S"
+  }
+}
+
 resource "aws_cloudwatch_event_rule" "event_rule" {
   name                = "linkedin_bot_event_rule"
   schedule_expression = "cron(34 8 ? * * *)"
