@@ -123,9 +123,9 @@ def main(event, context=None):
     random_quote: Dict[str, str] = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}\n")
-    post_on_linkedin_timeline(text, linkedin_token, linkedin_user_id)
-    copy_and_delete_from_dynamodb_table(SOURCE_TABLE_NAME, DESTINATION_TABLE_NAME, random_quote)
-    send_telegram_message(text)
+    # post_on_linkedin_timeline(text, linkedin_token, linkedin_user_id)
+    # copy_and_delete_from_dynamodb_table(SOURCE_TABLE_NAME, DESTINATION_TABLE_NAME, random_quote)
+    # send_telegram_message(text)
 
 
 if __name__ == "__main__":
