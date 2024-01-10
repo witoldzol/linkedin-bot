@@ -119,6 +119,8 @@ def main(event, context=None):
     if not linkedin_user_id:
         raise Exception("LINKEDIN_USER var not set, exiting")
     quotes = get_quotes("quotes", 50)
+    if not quotes:
+        raise Exception('No quotes returned from dynamodb query')
     random_quote: Dict[str, str] = random.choice(quotes)
     text = f'{random_quote["msg"]}\n- {random_quote["author"]}'
     print(f"Selected random quote:\n{text}\n")
@@ -128,4 +130,7 @@ def main(event, context=None):
 
 
 if __name__ == "__main__":
-    main({})
+    try:
+        main({})
+    except Exception as e: # this is a catch for unexpected errors. Sentry cannot pick up Error type. Example: IndexError
+        raise e
