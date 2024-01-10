@@ -2,7 +2,7 @@ from typing import List, Dict
 import os
 import boto3
 
-""" MANUAL USE ONLY """
+""" MANUAL USE ONLY"""
 
 source_table_name = 'quotes'
 destination_table_name = 'used_quotes'
@@ -42,5 +42,25 @@ def get_quotes(table_name: str, limit: int) -> List[Dict[str, str]]:
     )
     items = scan_response.get("Items", [])
     return items
+
+# def mark_quote_as_used_in_db(key_value: str):
+#     print("Marking quote as `used`")
+#     region = os.environ.get("AWS_REGION")
+#     dynamodb = boto3.resource("dynamodb", region_name=region)
+#     table_name = "quotes"
+#     table = dynamodb.Table(table_name)
+#     key = {"msg": key_value}
+#     update_expression = "SET #attributeName = :newValue"
+#     expression_attribute_names = {"#attributeName": "used"}
+#     expression_attribute_values = {":newValue": 1}
+#     print(f"Updating key: {key}")
+#     table.update_item(
+#         Key=key,
+#         UpdateExpression=update_expression,
+#         ExpressionAttributeNames=expression_attribute_names,
+#         ExpressionAttributeValues=expression_attribute_values,
+#     )
+#     print("Successfully marked item in dynamodb as `used`")
+
 
 copy_and_delete_from_dynamodb_table(source_table_name, destination_table_name)
