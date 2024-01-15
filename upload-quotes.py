@@ -1,13 +1,19 @@
+from typing import List, Tuple
 import os
 import boto3
+import sys
 
 
-def parse_quotes(filename):
+filename = sys.argv[1]
+def parse_quotes(filename) -> List[Tuple[str,str]]:
     quotes = []
+    c = "|"
     with open(filename, "r") as f:
-        c = chr(8211)  # this is a long dash -
         for l in f:
-            msg, author = l.rsplit(c, 1)
+            quote_and_author = l.rsplit(c)
+            if len(quote_and_author) > 2:
+                raise Exception(f"There is extra separator in this quote or author:\n{quote_and_author}")
+            msg, author = quote_and_author
             author = author.strip()
             if not author:
                 raise Exception(f"Error, empty author. Line: {l}")
@@ -18,18 +24,18 @@ def parse_quotes(filename):
             quotes.append(item)
     return quotes
 
-
 def get_item(item: tuple):
-    return {"author": item[0], "msg": item[1], "used": 0}
+    return {"author": item[0], "msg": item[1]}
 
 
-def main():
+def main(filename):
     region = os.environ.get("AWS_DEFAULT_REGION")
     dynamodb = boto3.resource("dynamodb", region_name=region)
     table = dynamodb.Table("quotes")
-    quotes = parse_quotes("quotes")
+    quotes = parse_quotes(filename)
     for q in quotes:
         item = get_item(q)
+        print(f"{item=}")
         response = ""
         try:
             response = table.put_item(
@@ -44,4 +50,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(filename)
