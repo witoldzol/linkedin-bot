@@ -44,100 +44,77 @@ def get_quotes(table_name: str, limit: int) -> List[Dict[str, str]]:
     return items
 
 
-# def mark_quote_as_used_in_db(key_value: str):
-#     print("Marking quote as `used`")
-#     region = os.environ.get("AWS_REGION")
-#     dynamodb = boto3.resource("dynamodb", region_name=region)
-#     table_name = "quotes"
-#     table = dynamodb.Table(table_name)
-#     key = {"msg": key_value}
-#     update_expression = "SET #attributeName = :newValue"
-#     expression_attribute_names = {"#attributeName": "used"}
-#     expression_attribute_values = {":newValue": 1}
-#     print(f"Updating key: {key}")
-#     table.update_item(
-#         Key=key,
-#         UpdateExpression=update_expression,
-#         ExpressionAttributeNames=expression_attribute_names,
-#         ExpressionAttributeValues=expression_attribute_values,
-#     )
-#     print("Successfully marked item in dynamodb as `used`")
+def mark_quote_as_used_in_db(key_value: str):
+    print("Marking quote as `used`")
+    region = os.environ.get("AWS_REGION")
+    dynamodb = boto3.resource("dynamodb", region_name=region)
+    table_name = "quotes"
+    table = dynamodb.Table(table_name)
+    key = {"msg": key_value}
+    update_expression = "SET #attributeName = :newValue"
+    expression_attribute_names = {"#attributeName": "used"}
+    expression_attribute_values = {":newValue": 1}
+    print(f"Updating key: {key}")
+    table.update_item(
+        Key=key,
+        UpdateExpression=update_expression,
+        ExpressionAttributeNames=expression_attribute_names,
+        ExpressionAttributeValues=expression_attribute_values,
+    )
+    print("Successfully marked item in dynamodb as `used`")
 
 
-# def parse_quotes(filename) -> List[Tuple[str,str]]:
-#     quotes = []
-#     c = chr(8211)  # this is a long dash -
-#     # check what type of separator we use in the file
-#     with open(filename, "r") as f:
-#         first_line = f.readline()
-#         result = first_line.split(c, 1)
-#         if len(result) == 2:
-#             print("We have a long dash")
-#         else:
-#             print("It's a normal dash")
-#             c = "-"
-#     with open(filename, "r") as f:
-#         for l in f:
-#             quote_and_author = l.rsplit(c)
-#             if len(quote_and_author) > 2:
-#                 raise Exception(f"There is extra separator in this quote or author:\n{quote_and_author}")
-#             msg, author = quote_and_author
-#             author = author.strip()
-#             if not author:
-#                 raise Exception(f"Error, empty author. Line: {l}")
-#             msg = msg.strip()
-#             if not msg:
-#                 raise Exception(f"Error, empty msg. Line: {l}")
-#             item = (author, msg)
-#             quotes.append(item)
-#     return quotes
+def replace_dash_with_pipe(filename):
+    file_output = "piped"
+    separator = "-"
+    with open(filename, "r") as f:
+        with open(file_output, "a") as wf:
+            for l in f:
+                arr = l.split(separator)
+                if len(arr) > 2:
+                    print("============================================================")
+                    print(f"{arr}")
+                    print("============================================================")
+                replaced = l.replace("-", "|")
+                wf.write(replaced)
 
 
-
-# def replace_dash_with_pipe(filename):
-#     file_output = "piped"
-#     separator = "-"
-#     with open(filename, "r") as f:
-#         with open(file_output, "a") as wf:
-#             for l in f:
-#                 arr = l.split(separator)
-#                 if len(arr) > 2:
-#                     print("============================================================")
-#                     print(f"{arr}")
-#                     print("============================================================")
-#                 replaced = l.replace("-", "|")
-#                 wf.write(replaced)
-
-#
-# def parse_quotes(filename) -> List[Tuple[str,str]]:
-#     quotes = []
-#     c = chr(8211)  # this is a long dash -
-#     # check what type of separator we use in the file
-#     with open(filename, "r") as f:
-#         first_line = f.readline()
-#         result = first_line.split(c, 1)
-#         if len(result) == 2:
-#             print("We have a long dash")
-#         else:
-#             print("It's a normal dash")
-#             c = "-"
-#     with open(filename, "r") as f:
-#         for l in f:
-#             quote_and_author = l.rsplit(c)
-#             if len(quote_and_author) > 2:
-#                 raise Exception(f"There is extra separator in this quote or author:\n{quote_and_author}")
-#             msg, author = quote_and_author
-#             author = author.strip()
-#             if not author:
-#                 raise Exception(f"Error, empty author. Line: {l}")
-#             msg = msg.strip()
-#             if not msg:
-#                 raise Exception(f"Error, empty msg. Line: {l}")
-#             item = (author, msg)
-#             quotes.append(item)
-#     return quotes
+def parse_quotes(filename) -> List[Tuple[str,str]]:
+    quotes = []
+    c = chr(8211)  # this is a long dash -
+    # check what type of separator we use in the file
+    with open(filename, "r") as f:
+        first_line = f.readline()
+        result = first_line.split(c, 1)
+        if len(result) == 2:
+            print("We have a long dash")
+        else:
+            print("It's a normal dash")
+            c = "-"
+    with open(filename, "r") as f:
+        for l in f:
+            quote_and_author = l.rsplit(c)
+            if len(quote_and_author) > 2:
+                raise Exception(f"There is extra separator in this quote or author:\n{quote_and_author}")
+            msg, author = quote_and_author
+            author = author.strip()
+            if not author:
+                raise Exception(f"Error, empty author. Line: {l}")
+            msg = msg.strip()
+            if not msg:
+                raise Exception(f"Error, empty msg. Line: {l}")
+            item = (author, msg)
+            quotes.append(item)
+    return quotes
 
 
+def randomize_file(filename):
+    import random
+    with open(filename, "r") as f:
+        lines = f.readlines()
+    random.shuffle(lines)
+    with open("randomized-quotes", "w") as f:
+        f.writelines(lines)
 
 
 copy_and_delete_from_dynamodb_table(source_table_name, destination_table_name)

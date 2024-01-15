@@ -1,3 +1,4 @@
+from random import shuffle
 from typing import List, Tuple
 import os
 import boto3
@@ -47,7 +48,6 @@ def main(filename):
             print(f"Item already exists.\nSkipped item: {item}")
         except Exception as e:
             print(f"Exception {e}")
-
 
 if __name__ == "__main__":
     main(filename)
