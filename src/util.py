@@ -117,4 +117,20 @@ def randomize_file(filename):
         f.writelines(lines)
 
 
+def get_quotes(table_name: str, limit: int) -> List[Dict[str, str]]:
+    region = os.environ.get("AWS_REGION")
+    dynamodb = boto3.resource("dynamodb", region_name=region)
+    table = dynamodb.Table(table_name)
+    expression_attribute_names = {"#used": "used"}
+    expression_attribute_values = {":val": 0}
+    filter_expression = "#used = :val"
+    scan_response = table.scan(
+        FilterExpression=filter_expression,
+        ExpressionAttributeNames=expression_attribute_names,
+        ExpressionAttributeValues=expression_attribute_values,
+        Limit=limit,
+    )
+    items = scan_response.get("Items", [])
+    return items
+
 copy_and_delete_from_dynamodb_table(source_table_name, destination_table_name)
