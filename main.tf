@@ -60,9 +60,13 @@ resource "aws_iam_policy" "lambda_policy" {
             "dynamodb:GetItem",
             "dynamodb:UpdateItem",
             "dynamodb:Query",
-            "dynamodb:Scan"
+            "dynamodb:Scan",
+            "dynamodb:DeleteItem"
           ],
-          "Resource": "${aws_dynamodb_table.quotes-table.arn}"
+          "Resource": [
+            "${aws_dynamodb_table.quotes-table.arn}",
+            "${aws_dynamodb_table.used_quotes_table.arn}"
+          ]
         }
     ]
 }
